@@ -1,0 +1,70 @@
+*repeatable.txt*  Create repeat.vim mappings with one simple 'Repeatable' command
+*Repeatable*
+
+ __   ___  __   ___       ___        __        ___               ~
+|__) |__  |__) |__   /.\   |   /.\  |__) |    |__   \  / |  |\/| ~
+|  \ |___ |    |___ /   \  |  /   \ |__) |___ |___ . \/  |  |  | ~
+                                                                 ~
+
+Author:      Jason Kreski <kreskij {at} gmail {dot} com>
+Repository: https://github.com/kreskij/Repeatable.vim
+License: MIT
+Description: Create repeat.vim mappings with one simple 'Repeatable' command
+
+
+==============================================================================
+CONTENTS                                                 *repeatable-contents*
+
+1. Introduction                                      |repeatable-introduction|
+2. Install                                                |repeatable-install|
+3. Usage                                                    |repeatable-usage|
+
+==============================================================================
+INTRODUCTION                                         *repeatable-introduction*
+
+Repeatable.vim provides a simple interface to create mappings via tpope's 
+repeat.vim plugin. 
+
+Simply add |Repeatable| in front of your mapping and it will be repeatable.
+
+==============================================================================
+INSTALL                                                   *repeatable-install*
+
+Use your favourite plugin manager to install. It requires tpope's repeat.vim
+to be installed as a dependency.
+
+Important: Add the |Repeatable| command to on-demand loading if your plugin
+manager supports it. Otherwise see the below |repeatable#Setup()|
+function. This ensures the 'Repeatable' command is defined before it is used.
+
+>
+  " Example using vim-plug
+  Plug 'tpope/vim-repeat'
+  Plug 'Repeatable.vim', { 'on': 'Repeatable' }
+<
+
+If your plugin manager doesn't support on-demand loading, call the 
+'repeatable#Setup()' function manually before you use the 'Repeatable' command
+
+>
+  call repeatable#Setup()                                  *repeatable#Setup()* 
+<
+==============================================================================
+USAGE                                                       *repeatable-usage*
+
+Define mappings as you normally would but add 'Repeatable' in front. This works
+with <expr> mappings too. See examples below.
+                                                                  *Repeatable*
+>
+
+  "Paste below/above and put cursor at the end of the paste
+
+  Repeatable nnoremap gp p`]
+  Repeatable nnoremap gP P`]
+
+  "Paste inside current line (overwrites line) (repeatable)
+
+  Repeatable nnoremap <expr> gpp '"_dd"'.v:register.'P'
+<
+
+vim:tw=78:ts=2:ft=help:norl:
