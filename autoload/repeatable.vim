@@ -43,6 +43,13 @@ function! repeatable#Run(mapping) "{{{
   if ! exists('g:repeatable_test_mode')
     let g:repeatable_test_mode = 0
   endif
+  if ! exists('g:repeatable_test_enable')
+    let g:repeatable_test_enable = 0
+  endif
+  let g:repeatable_test_enabled = 0
+  if g:repeatable_test_mode ==# 1 && g:repeatable_test_enable ==# 1
+    let g:repeatable_test_enabled = 1
+  endif
   if ! exists('g:repeatable_mapping_cpo_lt')
     let g:repeatable_mapping_cpo_lt = {}
   endif
@@ -63,6 +70,7 @@ function! repeatable#Run(mapping) "{{{
   if l:cpoptions_lt > 0
     let l:cpoptions_has_lt = 1
   endif
+
   "------------------------------------------------------------------------
   " Get the type of mapping 'vmap, nmap, nnoremap, etc'
   "------------------------------------------------------------------------
@@ -83,9 +91,7 @@ function! repeatable#Run(mapping) "{{{
   let l:mtr = substitute(l:mtr, '\v^((cm)|(cno)).*', 'cmap', '')
   let l:mtr = substitute(l:mtr, '\v^((tm)|(tno)).*', 'tmap', '')
   let l:mapping_type_recursive = l:mtr
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:mapping_type_recursive: ' . l:mapping_type_recursive
-  "endif
+  "call repeatable#DebugVars('l:', l:, 'mapping_type_recursive')
 
   "------------------------------------------------------------------------
   " Get the mapping type as non-recursive
@@ -102,9 +108,7 @@ function! repeatable#Run(mapping) "{{{
   let l:mtr = substitute(l:mtr, '\v^((cm)|(cno)).*', 'cnoremap', '')
   let l:mtr = substitute(l:mtr, '\v^((tm)|(tno)).*', 'tnoremap', '')
   let l:mapping_type_non_recursive = l:mtnr
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:mapping_type_non_recursive: ' . l:mapping_type_non_recursive
-  "endif
+  "call repeatable#DebugVars('l:', l:, 'mapping_type_non_recursive')
 
   "------------------------------------------------------------------------
   " Is Mapping Type recursive
@@ -132,11 +136,8 @@ function! repeatable#Run(mapping) "{{{
   let l:isexpr = (match(l:mapping_args, '\v\<\c(expr)\>') > -1) ? 1 : 0
   let l:issilent = (match(l:mapping_args, '\v\<\c(silent)\>') > -1) ? 1 : 0
   let l:isspecial = (match(l:mapping_args, '\v\<\c(special)\>') > -1) ? 1 : 0
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:mapping_args: ' . string(l:mapping_args)
-    "echom 'l:isexpr: ' . string(l:isexpr)
-    "echom 'l:issilent: ' . string(l:issilent)
-  "endif
+  let l:isscript = (match(l:mapping_args, '\v\<\c(script)\>') > -1) ? 1 : 0
+  "call repeatable#DebugVars('l:', l:, 'mapping_args', 'l:isexpr', 'l:issilent')
 
   "------------------------------------------------------------------------
   " Get the LHS+RHS
@@ -144,63 +145,56 @@ function! repeatable#Run(mapping) "{{{
   let l:lhsrhs = substitute(l:mapping, '\v^\w+', '', '') " Remove the mapping type
   let l:lhsrhs = substitute(l:lhsrhs, l:regex, '', '') " Remove the mapping args
   let l:lhsrhs = substitute(l:lhsrhs,'\v^\s*','','') " ltrim
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:lhsrhs: ' . string(l:lhsrhs)
-  "endif
+  "call repeatable#DebugVars('l:', l:, 'lhsrhs')
+
   "------------------------------------------------------------------------
   " Get the LHS from LHS+RHS
   "------------------------------------------------------------------------
   let l:lhs = matchstr(l:lhsrhs, '\v^\S+\s')
   let l:lhs = substitute(l:lhs,'\v\s$','','') " remove trailing separator space
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:lhs: ' . string(l:lhs)
-  "endif
+  "call repeatable#DebugVars('l:', l:, 'lhs')
+
   "------------------------------------------------------------------------
   " Get the RHS from LHS+RHS
   "------------------------------------------------------------------------
   let l:rhs_start = matchend(l:lhsrhs, '\v^\S+\s')
   let l:rhs = l:lhsrhs[l:rhs_start : -1]
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:rhs: ' . string(l:rhs)
-  "endif
+  "call repeatable#DebugVars('l:', l:, 'rhs')
 
   "------------------------------------------------------------------------
-  " Names for the <Plug> mappings
+  " Names for the <Plug> mappings to create
   "------------------------------------------------------------------------
   let s:repeat_mapping_cnt = (get(s:, 'repeat_mapping_cnt', 0) + 1)
   let l:plug_map_name = '<Plug>(repeatable-mapping-' . s:repeat_mapping_cnt . '-full)'
   let l:plug_map_name_l = '<Plug>(repeatable-mapping-' . s:repeat_mapping_cnt . '-left)'
   let l:plug_map_name_r = '<Plug>(repeatable-mapping-' . s:repeat_mapping_cnt . '-right)'
-  "if g:repeatable_test_mode ==# 1
-    "echom 'l:plug_map_name: ' . string(l:plug_map_name)
-    "echom 'l:plug_map_name_l: ' . string(l:plug_map_name_l)
-    "echom 'l:plug_map_name_r: ' . string(l:plug_map_name_r)
-  "endif
-
-  if g:repeatable_test_mode ==# 1
-    echohl ModeMsg
-    echom 'l:cpoptions_has_lt: '
-    echohl Normal 
-    echom l:cpoptions_has_lt
-  endif
+  call repeatable#DebugVars('l:', l:, 'plug_map_name', 'plug_map_name_l', 'plug_map_name_r')
+  call repeatable#DebugVars('l:', l:, 'cpoptions_has_lt')
 
   "----------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-left)} -> {RHS} mapping
   "----------------------------------------------------------
-  " Check if <expr> mapping
   let l:plug_mapping_l_args = ' '
+  " Add <silent> if present
   if l:issilent ==# 1
     let l:plug_mapping_l_args .= '<silent>'
   endif
+  " Add <expr> if present
   if l:isexpr ==# 1
     let l:plug_mapping_l_args .= '<expr>'
+  endif
+  if l:isscript ==# 1
+    let l:plug_mapping_l_args .= '<script>'
   endif
 
   let l:plug_mapping_l_rhs = l:rhs
 
   " If cpoptions has '<'
-  if l:cpoptions_has_lt && ! l:isspecial
+  if l:cpoptions_has_lt
     let l:plug_mapping_l_args .= '<special>'
+  endif
+  " If cpoptions has '<' and not <special
+  if l:cpoptions_has_lt && ! l:isspecial
     if l:issilent ==# 0
       let l:plug_mapping_l_args .= '<silent>'
     endif
@@ -212,6 +206,7 @@ function! repeatable#Run(mapping) "{{{
     let g:repeatable_mapping_cpo_lt[string(s:repeat_mapping_cnt)] = l:norm . ' ' . l:rhs
     let l:cpo_lt_idx = 'g:repeatable_mapping_cpo_lt["'.string(s:repeat_mapping_cnt).'"]'
     let l:plug_mapping_l_rhs = '<Esc>:execute ' . l:cpo_lt_idx . '<CR>'
+    call repeatable#DebugVars('g:', g:, 'repeatable_mapping_cpo_lt')
   endif
 
   if l:plug_mapping_l_args !=# ' ' " Fix spaces
@@ -221,12 +216,7 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_l .= l:plug_mapping_l_args
   let l:plug_mapping_l .= l:plug_map_name_l . ' '
   let l:plug_mapping_l .= l:plug_mapping_l_rhs
-  if g:repeatable_test_mode ==# 1
-    echohl ModeMsg
-    echom 'l:plug_mapping_l: '
-    echohl Normal 
-    echom l:plug_mapping_l
-  endif
+  call repeatable#DebugVars('l:', l:, 'plug_mapping_l')
 
   "----------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-right)} -> {REPEAT COMMAND}
@@ -237,12 +227,7 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_r .= l:plug_map_name_r . ' '
   "let l:plug_mapping_r .= '<Esc>:silent! call repeat#set("\' . l:plug_map_name . '")<CR>'
   let l:plug_mapping_r .= '<Esc>:call repeatable#Set("\' . l:plug_map_name . '")<CR>'
-  if g:repeatable_test_mode ==# 1
-    echohl ModeMsg
-    echom 'l:plug_mapping_r: '
-    echohl Normal 
-    echom l:plug_mapping_r
-  endif
+  call repeatable#DebugVars('l:', l:, 'plug_mapping_r')
 
   "-----------------------------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-full)} -> 
@@ -256,12 +241,7 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_full .= l:plug_map_name . ' '
   let l:plug_mapping_full .= l:plug_map_name_l
   let l:plug_mapping_full .= l:plug_map_name_r
-  if g:repeatable_test_mode ==# 1
-    echohl ModeMsg
-    echom 'l:plug_mapping_full: '
-    echohl Normal 
-    echom l:plug_mapping_full
-  endif
+  call repeatable#DebugVars('l:', l:, 'plug_mapping_full')
 
   "-----------------------------------------------------------------------------
   " {LHS} -> {<Plug>(repeatable-mapping-#-full)} mapping
@@ -275,6 +255,9 @@ function! repeatable#Run(mapping) "{{{
   " Remove the <silent>
   if l:issilent ==# 1
     let l:to_plug_mapping_args = substitute(l:to_plug_mapping_args, '\v\s*\<silent\>\s*', '', 'g')
+  endif
+  if l:isscript ==# 1
+    let l:to_plug_mapping_args = substitute(l:to_plug_mapping_args, '\v\s*\<script\>\s*', '', 'g')
   endif
 
   " If cpoptions+=< and no <special> arg is present, the mapping {RHS}
@@ -298,16 +281,9 @@ function! repeatable#Run(mapping) "{{{
   let l:to_plug_mapping .= l:lhs . ' '
   let l:to_plug_mapping .= l:plug_map_name_esc
 
-  if g:repeatable_test_mode ==# 1
-    echohl ModeMsg
-    echom 'l:to_plug_mapping: '
-    echohl Normal 
-    echom l:to_plug_mapping
-  endif
+  call repeatable#DebugVars('l:', l:, 'to_plug_mapping')
+  call repeatable#Debug('-----------------------------------------------')
 
-  if g:repeatable_test_mode ==# 1
-    echom '------------------------------------------------'
-  endif
 
 
   "-------------
@@ -368,13 +344,46 @@ function! repeatable#Set(mapping) "{{{
   endtry
 endfunction "}}}
 
-
 "==============================================================================
-" repeatable#ExecuteMapping(): 
+" repeatable#DebugVars(): 
 "==============================================================================
-function! repeatable#ExecuteMapping(mapping_name)
-  echom a:mapping_name
-endfunction
+function! repeatable#DebugVars(scopename, scope, ...) "{{{
+  if g:repeatable_test_enabled ==# 1
+    if a:0 ==# 1
+      echohl ModeMsg
+      echom a:scopename . a:1
+      echohl Normal 
+      if type(a:scope[a:1]) ==# 1 " String
+        echom a:scope[a:1]
+      else
+        echom string(a:scope[a:1])
+      endif
+    else
+      let l:title = ''
+      for l:i in a:000
+        let l:title .= a:scopename . l:i . ' '
+      endfor
+      echohl ModeMsg
+      echom l:title
+      echohl Normal 
+      for l:i in a:000
+        if type(a:scope[l:i]) ==# 1 " String
+          echom a:scope[l:i]
+        else
+          echom string(a:scope[l:i])
+        endif
+      endfor
+    endif
+  endif
+endfunction "}}}
+"==============================================================================
+" repeatable#Debug(): 
+"==============================================================================
+function! repeatable#Debug(str) "{{{
+  if g:repeatable_test_enabled ==# 1
+    echom a:str
+  endif
+endfunction "}}}
 
 
 let &cpoptions = s:save_cpoptions
