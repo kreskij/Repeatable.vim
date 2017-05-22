@@ -37,7 +37,7 @@ Add the ```Repeatable``` command to on-demand loading if your plugin manager sup
 ```vim
 " Example using vim-plug and on-demand loading
 Plug 'tpope/vim-repeat'
-Plug 'Repeatable.vim', { 'on': 'Repeatable' }
+Plug 'kreskij/Repeatable.vim', { 'on': 'Repeatable' }
 ```
 
 ## Install without on-demand loading
@@ -47,7 +47,7 @@ the ```repeatable#Setup()``` function before any use of the ```Repeatable``` com
 ```vim
 " Example using vim-plug and without on-demand loading
 Plug 'tpope/vim-repeat'
-Plug 'Repeatable.vim'
+Plug 'kreskij/Repeatable.vim'
 "...
 call repeatable#Setup()
 ```
