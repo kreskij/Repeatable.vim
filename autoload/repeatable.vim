@@ -149,8 +149,8 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_map_name = '<Plug>(repeatable-mapping-' . s:repeat_mapping_cnt . '-full)'
   let l:plug_map_name_l = '<Plug>(repeatable-mapping-' . s:repeat_mapping_cnt . '-left)'
   let l:plug_map_name_r = '<Plug>(repeatable-mapping-' . s:repeat_mapping_cnt . '-right)'
-  call repeatable#DebugVars('l:', l:, 'plug_map_name', 'plug_map_name_l', 'plug_map_name_r')
-  call repeatable#DebugVars('l:', l:, 'cpoptions_has_lt')
+  "call repeatable#DebugVars('l:', l:, 'plug_map_name', 'plug_map_name_l', 'plug_map_name_r')
+  "call repeatable#DebugVars('l:', l:, 'cpoptions_has_lt')
 
   "----------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-left)} -> {RHS} mapping
@@ -187,7 +187,7 @@ function! repeatable#Run(mapping) "{{{
     let g:repeatable_mapping_cpo_lt[string(s:repeat_mapping_cnt)] = l:norm . ' ' . l:rhs
     let l:cpo_lt_idx = 'g:repeatable_mapping_cpo_lt["'.string(s:repeat_mapping_cnt).'"]'
     let l:plug_mapping_l_rhs = '<Esc>:execute ' . l:cpo_lt_idx . '<CR>'
-    call repeatable#DebugVars('g:', g:, 'repeatable_mapping_cpo_lt')
+    "call repeatable#DebugVars('g:', g:, 'repeatable_mapping_cpo_lt')
   endif
 
   if l:plug_mapping_l_args !=# ' ' " Fix spaces
@@ -197,7 +197,7 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_l .= l:plug_mapping_l_args
   let l:plug_mapping_l .= l:plug_map_name_l . ' '
   let l:plug_mapping_l .= l:plug_mapping_l_rhs
-  call repeatable#DebugVars('l:', l:, 'plug_mapping_l')
+  "call repeatable#DebugVars('l:', l:, 'plug_mapping_l')
 
   "----------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-right)} -> {REPEAT COMMAND}
@@ -208,7 +208,7 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_r .= l:plug_map_name_r . ' '
   "let l:plug_mapping_r .= '<Esc>:silent! call repeat#set("\' . l:plug_map_name . '")<CR>'
   let l:plug_mapping_r .= '<Esc>:call repeatable#Set("\' . l:plug_map_name . '")<CR>'
-  call repeatable#DebugVars('l:', l:, 'plug_mapping_r')
+  "call repeatable#DebugVars('l:', l:, 'plug_mapping_r')
 
   "-----------------------------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-full)} -> 
@@ -222,7 +222,7 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_full .= l:plug_map_name . ' '
   let l:plug_mapping_full .= l:plug_map_name_l
   let l:plug_mapping_full .= l:plug_map_name_r
-  call repeatable#DebugVars('l:', l:, 'plug_mapping_full')
+  "call repeatable#DebugVars('l:', l:, 'plug_mapping_full')
 
   "-----------------------------------------------------------------------------
   " {LHS} -> {<Plug>(repeatable-mapping-#-full)} mapping
@@ -262,16 +262,8 @@ function! repeatable#Run(mapping) "{{{
   let l:to_plug_mapping .= l:lhs . ' '
   let l:to_plug_mapping .= l:plug_map_name_esc
 
-  call repeatable#DebugVars('l:', l:, 'to_plug_mapping')
-  call repeatable#Debug('-----------------------------------------------')
-
-  "-------------
-  " TEST
-  "-------------
-  "let l:to_plug_mapping = ''
-  "let l:to_plug_mapping .= l:mapping_type_recursive . ' '
-  "let l:to_plug_mapping_args = l:mapping_args
-  "let l:to_plug_mapping = '<C-R>='
+  "call repeatable#DebugVars('l:', l:, 'to_plug_mapping')
+  "call repeatable#Debug('-----------------------------------------------')
 
   "-----------------------------------------------------------------------------
   " Create the 4 mappings needed
@@ -280,33 +272,6 @@ function! repeatable#Run(mapping) "{{{
   execute l:plug_mapping_r
   execute l:plug_mapping_full
   execute l:to_plug_mapping
-
-
-  "-----------------------------------------------------------------------------
-  " Explanation/Example of what's done:
-  "-----------------------------------------------------------------------------
-  "
-  "   :Repeatable nnoremap dl dd
-  "
-  "     ->
-  "
-  "      1.Create a <Plug> mapping to the {RHS}
-  "
-  "           nnoremap <Plug>(repeatable-mapping-1-left) dd
-  "
-  "      2. Create a <Plug> mapping to the repeat#set() command
-  "
-  "           nnoremap <Plug>(repeatable-mapping-1-right) <Esc>:silent! call repeat#set("\<Plug>(repeatable-mapping-1-full)<CR>
-  "
-  "      3. Create a <Plug> mapping to the previous 2 <Plug> mappings
-  "
-  "          nmap <Plug>(repeatable-mapping-1-full) <Plug>(repeatable-mapping-1-left)<Plug>(repeatable-mapping-1-right)
-  "
-  "      4. Create mapping from the {LHS} to the mapping in #3.
-  "
-  "          nmap dl <Plug>(repeatable-mapping-1-full)
-  "
-  "-----------------------------------------------------------------------------
 
 endfunction "}}}
 
