@@ -6,9 +6,7 @@
 "}}}
 "=============================================================================
 " Guard, save_cpo {{{
-if exists('g:loaded_vim_repeatable')
-  finish
-endif
+if exists('g:loaded_vim_repeatable') | finish | endif
 let g:loaded_vim_repeatable = 1
 let s:save_cpo = &cpoptions
 set cpoptions&vim

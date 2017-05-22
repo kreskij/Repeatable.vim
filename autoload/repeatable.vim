@@ -10,29 +10,20 @@ set cpoptions&vim
 set cpoptions-=b
 set cpoptions-=B
 let s:script_path = fnamemodify(resolve(expand('<sfile>')),':h')
-" Set to 1 to run tests
-let s:run_test = 1
-
-" TODO: ignore issilent and isspecial if cpoptions+=<
+" Guard
+if exists('g:loaded_repeatable_autoload') | finish | endif
+let g:loaded_repeatabe_autoload = 1
+let g:repeatable_run_test = 0  " Set to 1 to source the test file
 
 "==============================================================================
 " repeatable#Setup(): 
 "==============================================================================
 function! repeatable#Setup() "{{{
   let s:repeat_mapping_cnt = 1
+  " Define the Repeatable command
   command! -nargs=* Repeatable call repeatable#Run(<q-args>) 
-
-  " Test?
-  if s:run_test ==# 1
-    if has('win64') || has('win32') || has('win16')
-      let l:dirsep = '\'
-    else
-      let l:dirsep = '/'
-    endif
-    let s:plugin_path = fnamemodify(s:script_path, ':h')
-    let s:test_path = s:plugin_path . l:dirsep . 'test' . l:dirsep . 'test.vim'
-    execute 'source ' . s:test_path
-    let s:run_test = 0
+  if g:repeatable_run_test ==# 1 " Test?
+    execute 'source ' . fnamemodify(s:script_path, ':h') . '/test/' . 'test.vim'
   endif
 endfunction "}}}
 
@@ -40,16 +31,6 @@ endfunction "}}}
 " repeatable#Run(): 
 "==============================================================================
 function! repeatable#Run(mapping) "{{{
-  if ! exists('g:repeatable_test_mode')
-    let g:repeatable_test_mode = 0
-  endif
-  if ! exists('g:repeatable_test_enable')
-    let g:repeatable_test_enable = 0
-  endif
-  let g:repeatable_test_enabled = 0
-  if g:repeatable_test_mode ==# 1 && g:repeatable_test_enable ==# 1
-    let g:repeatable_test_enabled = 1
-  endif
   if ! exists('g:repeatable_mapping_cpo_lt')
     let g:repeatable_mapping_cpo_lt = {}
   endif
@@ -284,8 +265,6 @@ function! repeatable#Run(mapping) "{{{
   call repeatable#DebugVars('l:', l:, 'to_plug_mapping')
   call repeatable#Debug('-----------------------------------------------')
 
-
-
   "-------------
   " TEST
   "-------------
@@ -348,7 +327,7 @@ endfunction "}}}
 " repeatable#DebugVars(): 
 "==============================================================================
 function! repeatable#DebugVars(scopename, scope, ...) "{{{
-  if g:repeatable_test_enabled ==# 1
+  if g:repeatable_run_test ==# 1
     if a:0 ==# 1
       echohl ModeMsg
       echom a:scopename . a:1
@@ -380,7 +359,7 @@ endfunction "}}}
 " repeatable#Debug(): 
 "==============================================================================
 function! repeatable#Debug(str) "{{{
-  if g:repeatable_test_enabled ==# 1
+  if g:repeatable_run_test ==# 1
     echom a:str
   endif
 endfunction "}}}

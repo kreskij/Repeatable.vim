@@ -1,12 +1,7 @@
-let g:repeatable_test_enable = 1
-
 "------------------------------------------------------------------------------
 " COMBINATIONS
 "-------------------------------------------------------------------------------
 
-augroup RepeatableTest
-  autocmd!
-augroup END
 
 function! g:RepeatableTest()
    
@@ -35,10 +30,8 @@ function! g:RepeatableTest()
   " 'acaa' shouldn't be accessible
   Repeatable nnoremap <buffer><nowait> aca dd
   Repeatable nnoremap acaa j
-  "let g:repeatable_test_mode = 1
   Repeatable nnoremap <nowait><buffer> acb dd
   Repeatable nnoremap acba j
-  "let g:repeatable_test_mode = 0
   " 'acbb' should be accessible
   Repeatable nnoremap <buffer> acc j
   Repeatable nnoremap acca dd
@@ -48,12 +41,10 @@ function! g:RepeatableTest()
   "--------------------------------------------------------------------
   " <silent> (PASS)
   "--------------------------------------------------------------------
-  "let g:repeatable_test_mode = 1
   " Should not appear in :Ex
   Repeatable nnoremap <silent> ada :sleep 2<CR>
   " Should appear in :Ex
   Repeatable nnoremap adb :sleep 2<CR>
-  "let g:repeatable_test_mode = 0
   "--------------------------------------------------------------------
   " <silent> with cpoptions+=< (FAIL)
   "--------------------------------------------------------------------
@@ -297,14 +288,13 @@ function! g:RepeatableTest()
   "--------------------------------------------------------------------
   " <C-R>= (PASS)
   "--------------------------------------------------------------------
-  let g:repeatable_test_mode = 1
   Repeatable nnoremap aha i<C-R>=toupper('h')<CR><Esc>
-  let g:repeatable_test_mode = 0
 
   "Repeatable nnoremap <expr><buffer> ad 'dd'
-  let g:repeatable_test_mode = 0
 endfunction
 
-
+augroup RepeatableTest
+  autocmd!
+augroup END
 autocmd RepeatableTest BufEnter test.vim call g:RepeatableTest()
 
