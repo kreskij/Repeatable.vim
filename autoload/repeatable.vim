@@ -2,7 +2,7 @@
 " File:        autoload/repeatable.vim {{{
 " Author:      Jason Kreski <kreskij {at} gmail {dot} com>
 " License:     MIT license
-" Description: Autoloaded functions vim-repeatable
+" Description: Autoloaded functions Repeatable.vim
 "}}}
 "=============================================================================
 let s:save_cpoptions = &cpoptions
@@ -23,7 +23,7 @@ function! repeatable#Setup() "{{{
   " Define the Repeatable command
   command! -nargs=* Repeatable call repeatable#Run(<q-args>) 
   if g:repeatable_run_test ==# 1 " Test?
-    execute 'source ' . fnamemodify(s:script_path, ':h') . '/test/' . 'test.vim'
+    execute 'source ' . fnamemodify(s:script_path, ':h') . '/test/' . 'repeatable-test.vim'
   endif
 endfunction "}}}
 
@@ -48,9 +48,7 @@ function! repeatable#Run(mapping) "{{{
   "------------------------------------------------------------------------
   let l:cpoptions_lt = strridx(&cpoptions, '<')
   let l:cpoptions_has_lt = 0
-  if l:cpoptions_lt > 0
-    let l:cpoptions_has_lt = 1
-  endif
+  if l:cpoptions_lt > 0 | let l:cpoptions_has_lt = 1 | endif
 
   "------------------------------------------------------------------------
   " Get the type of mapping 'vmap, nmap, nnoremap, etc'
@@ -111,9 +109,6 @@ function! repeatable#Run(mapping) "{{{
   let l:ma = matchstr(l:ma, l:regex)
   let l:ma = substitute(l:ma,'\v^\s*(.{-})\s*$','\1','') " trim
   let l:mapping_args = l:ma
-  let l:isexpr = 0
-  let l:issilent = 0
-  let l:isspecial = 0
   let l:isexpr = (match(l:mapping_args, '\v\<\c(expr)\>') > -1) ? 1 : 0
   let l:issilent = (match(l:mapping_args, '\v\<\c(silent)\>') > -1) ? 1 : 0
   let l:isspecial = (match(l:mapping_args, '\v\<\c(special)\>') > -1) ? 1 : 0
@@ -208,7 +203,6 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_r .= l:plug_map_name_r . ' '
   "let l:plug_mapping_r .= '<Esc>:silent! call repeat#set("\' . l:plug_map_name . '")<CR>'
   let l:plug_mapping_r .= '<Esc>:call repeatable#Set("\' . l:plug_map_name . '")<CR>'
-  "call repeatable#DebugVars('l:', l:, 'plug_mapping_r')
 
   "-----------------------------------------------------------------------------
   " {<Plug>(repeatable-mapping-#-full)} -> 
@@ -222,7 +216,6 @@ function! repeatable#Run(mapping) "{{{
   let l:plug_mapping_full .= l:plug_map_name . ' '
   let l:plug_mapping_full .= l:plug_map_name_l
   let l:plug_mapping_full .= l:plug_map_name_r
-  "call repeatable#DebugVars('l:', l:, 'plug_mapping_full')
 
   "-----------------------------------------------------------------------------
   " {LHS} -> {<Plug>(repeatable-mapping-#-full)} mapping
@@ -262,9 +255,6 @@ function! repeatable#Run(mapping) "{{{
   let l:to_plug_mapping .= l:lhs . ' '
   let l:to_plug_mapping .= l:plug_map_name_esc
 
-  "call repeatable#DebugVars('l:', l:, 'to_plug_mapping')
-  "call repeatable#Debug('-----------------------------------------------')
-
   "-----------------------------------------------------------------------------
   " Create the 4 mappings needed
   "-----------------------------------------------------------------------------
@@ -276,7 +266,7 @@ function! repeatable#Run(mapping) "{{{
 endfunction "}}}
 
 "==============================================================================
-" repeatable#Set(): 
+" repeatable#Set(): wrapper for repeat#set() with check for repeat.vim
 "==============================================================================
 function! repeatable#Set(mapping) "{{{
   try
@@ -318,14 +308,6 @@ function! repeatable#DebugVars(scopename, scope, ...) "{{{
         endif
       endfor
     endif
-  endif
-endfunction "}}}
-"==============================================================================
-" repeatable#Debug(): 
-"==============================================================================
-function! repeatable#Debug(str) "{{{
-  if g:repeatable_run_test ==# 1
-    echom a:str
   endif
 endfunction "}}}
 
