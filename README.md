@@ -1,6 +1,6 @@
 # Repeatable.vim
 
-Repeatable.vim provides a simple interface to create repeatable mappings via tpope's 
+Repeatable.vim provides a simple interface to create dot(.) repeatable mappings via tpope's 
 [repeat.vim](https://github.com/tpope/vim-repeat). Add
 ```Repeatable``` in front of your mapping and it will be
 repeatable. This works with the various mapping arguments such as
