@@ -76,16 +76,16 @@ function! repeatable#Run(mapping) "{{{
   " Get the mapping type as non-recursive
   "------------------------------------------------------------------------
   let l:mtnr = l:mapping_type
-  let l:mtr = substitute(l:mtr, '\v^((map)|(no)).*', 'noremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((nm)|(nn)).*', 'nnoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((vm)|(vn)).*', 'vnoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((xm)|(xn)).*', 'xnoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((smap)|(snor)).*', 'snoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((om)|(ono)).*', 'onoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((im)|(ino)).*', 'inoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((lm)|(ln)).*', 'lnoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((cm)|(cno)).*', 'cnoremap', '')
-  let l:mtr = substitute(l:mtr, '\v^((tm)|(tno)).*', 'tnoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((map)|(no)).*', 'noremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((nm)|(nn)).*', 'nnoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((vm)|(vn)).*', 'vnoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((xm)|(xn)).*', 'xnoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((smap)|(snor)).*', 'snoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((om)|(ono)).*', 'onoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((im)|(ino)).*', 'inoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((lm)|(ln)).*', 'lnoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((cm)|(cno)).*', 'cnoremap', '')
+  let l:mtnr = substitute(l:mtnr, '\v^((tm)|(tno)).*', 'tnoremap', '')
   let l:mapping_type_non_recursive = l:mtnr
   "call repeatable#DebugVars('l:', l:, 'mapping_type_non_recursive')
 
