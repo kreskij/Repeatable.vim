@@ -1,0 +1,8 @@
+Repeatable	repeatable.txt	/*Repeatable*
+Repeatable	repeatable.txt	/*Repeatable*
+repeatable#Setup()	repeatable.txt	/*repeatable#Setup()*
+repeatable-contents	repeatable.txt	/*repeatable-contents*
+repeatable-install	repeatable.txt	/*repeatable-install*
+repeatable-introduction	repeatable.txt	/*repeatable-introduction*
+repeatable-usage	repeatable.txt	/*repeatable-usage*
+repeatable.txt	repeatable.txt	/*repeatable.txt*
