@@ -5,5 +5,5 @@
 " Description: Syntax file for Repeatable.vim
 "}}}
 "=============================================================================
-syntax keyword vimRepeatableCommand Repeatable
+syntax keyword vimRepeatableCommand Repeatable containedin=vimIsCommand
 highlight link vimRepeatableCommand vimMap
